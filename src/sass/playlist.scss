@@ -1,0 +1,106 @@
+.header > a {
+    float: right;
+}
+
+.loading {
+    font-style: italic;
+}
+
+.hidden-text {
+    font-size: 0;
+}
+
+li {
+    .badge {
+        cursor: pointer;
+        display: none;
+    }
+
+    &.mouseover > .badge {
+        display: block;
+    }
+}
+
+.list-group {
+    list-style: decimal inside;
+ 
+    .list-group-item {
+        display: list-item;
+    }
+}
+
+.well-second {
+    width: 20%;
+    float: right;
+    
+    input {
+        margin-bottom: 20px;
+    }
+
+    .btn-group {
+        width: 45%;
+
+        button {
+            width: 100%;
+        }
+    }
+
+    .alert-info {
+        width: 45%;
+    }
+}
+
+.well-first {
+    width: 75%;
+
+    div {
+        display: inline-block;
+    }
+
+    .btn-group {
+        width: 65%;
+
+        button {
+            width: 20%;
+        }
+
+        button:first-child {
+            width: 40%;
+        }
+    }
+
+    .progress {
+        background: #FFF;
+        display: block;
+
+         .progress-bar {
+            transition: width .9s linear;
+        }
+    }
+
+    .alert-info {
+        width: 30%;
+    }
+}
+
+.well .alert-info {
+    float: right;
+    text-align: center;
+    font-family: monospace;
+    height: 40px;
+    vertical-align: middle;
+    padding: 10px;
+    margin: 0px;
+}
+
+.bs-callout {
+    padding: 20px;
+    margin: 20px 0;
+    border: 1px solid #eee;
+    border-left-width: 5px;
+    border-radius: 3px;
+}
+
+.bs-callout-info {
+    border-left-color: #5bc0de;
+}

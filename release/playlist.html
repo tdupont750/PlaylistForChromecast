@@ -1,0 +1,67 @@
+<html>
+<head>
+	<title>Playlist</title>
+    <link href="css/bootstrap.min.css" rel="stylesheet">
+	<link href="css/playlist.css" rel="stylesheet">
+</head>
+<body>
+	<div class="container">
+		<div class="header">
+			<a href="http://github.com/">Open Source on GitHub</a>
+			<h1>Playlist for Chromecast</h1>
+		</div>
+		<div class="well well-second">
+			<input id="volume" type="range" min="0" max="100" value="80">
+			<div class="btn-group btn-group-lg" role="group" aria-label="...">
+				<button type="button" class="btn btn-default" id="mute">
+					<span class="glyphicon glyphicon-volume-off">
+				</button>
+			</div>
+			<div id="volume-display" class="alert alert-info" role="alert">
+				100%
+			</div>
+		</div>
+		<div class="well well-first">
+			<div class="progress">
+				<div id="progress-percent" class="progress-bar progress-bar-info" role="progressbar" aria-valuenow="0" aria-valuemin="0" aria-valuemax="100" style="width: 0%;"></div>
+			</div>
+			<div class="btn-group btn-group-lg" role="group" aria-label="...">
+				<button type="button" class="btn btn-default" id="toggle">
+					<span class="glyphicon glyphicon-play"> / <span class="glyphicon glyphicon-pause">
+				</button>
+				<button type="button" class="btn btn-default" id="stop">
+					<span class="glyphicon glyphicon-stop">
+				</button>
+				<button type="button" class="btn btn-default" id="prev">
+					<span class="glyphicon glyphicon-backward">
+				</button>
+				<button type="button" class="btn btn-default" id="next">
+					<span class="glyphicon glyphicon-forward">
+				</button>
+			</div>
+			<div id="progress-time" class="alert alert-info" role="alert">
+				00:00 / 00:00
+			</div>
+		</div>
+		<div class="bs-callout bs-callout-info" id="start">
+			To begin, drag and drop audio files on to the page.
+		</div>
+		<ol class="list-group" id="list"></ol>
+	</div>
+	<ol id="ol-template" class="hidden">
+		<li class="list-group-item">
+			<div class="badge">
+				<span class="glyphicon glyphicon-remove"></span>
+			</div>
+			<div class="badge">
+				<span class="glyphicon glyphicon-arrow-down"></span>
+			</div>
+			<div class="badge">
+				<span class="glyphicon glyphicon-arrow-up"></span>
+			</div>
+			<span>Name</span>
+		</li>
+	</ol>
+	<script src="js/playlist.js" type="text/javascript"></script>
+</body>
+</html>
