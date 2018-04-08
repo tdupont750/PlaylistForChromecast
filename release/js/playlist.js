@@ -1,3 +1,5 @@
+"use strict";
+
 function createAudioEngine() {
     const _context = new AudioContext();
     const _gain = _context.createGain();
@@ -53,6 +55,7 @@ function createAudioEngine() {
         _source.stop(0);
     }
 }
+
 function createPlaylistService(audioEngine) {
     const _audioEngine = audioEngine;
     const _playlist = [];
@@ -259,8 +262,10 @@ function createPlaylistService(audioEngine) {
         }
     }
 }
-function createPlaylistView(playlistService) {
+
+function createPlaylistView(playlistService, visualizer) {
     const _playlistService = playlistService;
+    const _visualizer = visualizer;
     const _list = document.getElementById("list");
     const _percent = document.getElementById("progress-percent");
     const _time = document.getElementById("progress-time");
@@ -268,6 +273,14 @@ function createPlaylistView(playlistService) {
     const _volumeDisplay = document.getElementById("volume-display");
     const _volume = document.getElementById("volume");
     const _volumeKey = "playlist_volume";
+	
+	let _hasLocalStorage = false;
+	try {
+		_hasLocalStorage = localStorage && localStorage.getItem && localStorage.setItem;
+	} catch (ex) {
+		console.log("No access to localStorage - " + ex);
+	}
+	
     let _isFirstDrop = true;
     let _blinkId = 0;
     {
@@ -284,21 +297,30 @@ function createPlaylistView(playlistService) {
         document.getElementById("stop").onclick = createCallback(_playlistService.stop);
         document.getElementById("prev").onclick = createCallback(_playlistService.prev);
         document.getElementById("next").onclick = createCallback(_playlistService.next);
+        document.getElementById("visualize").onclick = createCallback(_visualizer.toggle, true);
         let body = document.getElementsByTagName("body")[0];
         body.addEventListener("dragover", onDragOver, false);
         body.addEventListener("drop", onDrop, false);
         body.onkeyup = onKeyUp;
         body.onkeydown = onKeyDown;
-        let item = localStorage.getItem(_volumeKey);
-        if (item) {
-            _volume.value = item;
-        }
-        onVolumeChange();
-        _volume.onchange = onVolumeChange;
+		body.onclick = onClick;
+		
+		if (_hasLocalStorage) {
+			let item = localStorage.getItem(_volumeKey);
+			if (item) {
+				_volume.value = item;
+			}
+		}
+		onVolumeChange();
+		_volume.onchange = onVolumeChange;
     }
-    function createCallback(fn) {
+    function createCallback(fn, prevent) {
         return onClick;
         function onClick(ev) {
+			if (prevent === true) {
+				ev.preventDefault();
+				ev.stopPropagation();
+			}
             ev.srcElement.blur();
             fn();
         }
@@ -411,6 +433,11 @@ function createPlaylistView(playlistService) {
             _playlistService.next();
         }
     }
+	function onClick(ev) {
+		if (_visualizer.isEnabled()) {
+			_visualizer.toggle();
+		}
+	}
     function onJumpToTrack(ev) {
         let el = ev.srcElement.nodeName === "SPAN"
             ? ev.srcElement.parentElement
@@ -468,13 +495,93 @@ function createPlaylistView(playlistService) {
         ev.srcElement.classList.remove("mouseover");
     }
     function onVolumeChange() {
-        localStorage.setItem(_volumeKey, _volume.value);
+		if (_hasLocalStorage) {
+			localStorage.setItem(_volumeKey, _volume.value);
+		}
+        
         _volumeDisplay.textContent = _volume.value + "%";
         let value = parseInt(_volume.value);
         _playlistService.setVolume(value);
     }
 }
-"use strict";
+
+// TODO Remove dependency on DOM
+function createVisualizer() {
+	let _enabled = false;
+	
+	return {
+		toggle: toggle,
+		isEnabled: isEnabled
+	};
+	
+	function isEnabled() {
+		return _enabled;
+	}
+	
+	function toggle() {
+		if (_enabled) {
+			_enabled = false;
+			document.body.classList.remove('visualize');
+			let els = document.getElementsByClassName('visualize');
+			for (let i = 0; i < els.length; i++) {
+				els[i].style.visibility = 'hidden';
+			}
+		} else {
+			_enabled = true;
+			document.body.classList.add('visualize');
+			visualize();
+		}
+	}
+	
+	function visualize() {		
+		if (_enabled == false) {
+			return;
+		}
+		
+		let next = rand(1, 5),
+		    duration = rand(10, 16),
+			opacity = rand(4, 8),
+		    motion = ' motion_' + rand(1, 4),
+		    color = ', color_' + rand(1, 3),
+		    size = ', size_' + rand(1, 4),
+			timing = rand (1, 5);
+		
+		let style = 'opacity: 0.' + opacity + ';';
+		style += ' animation:' + motion + color + size + ';';
+		style += ' animation-duration: ' + duration + 's;';
+		style += ' animation-iteration-count: 1;';
+		
+		if (timing == 1) {
+			style += ' animation-timing-function: ease;'
+		} else if (timing == 2) {
+			style += ' animation-timing-function: ease-in;'
+		} else if (timing == 3) {
+			style += ' animation-timing-function: ease-out;'
+		} else {
+			style += ' animation-timing-function: linear;'
+		} 
+		
+		let div = document.createElement('div');
+		div.classList.add('visualize');
+		div.setAttribute('style', style);
+		document.body.appendChild(div);
+		
+		setTimeout(removeDiv, duration * 1000);
+		setTimeout(visualize, next * 250);
+		
+		function removeDiv() {
+			document.body.removeChild(div);
+		}
+	}
+	
+	function rand(min, max) {
+		return Math.floor((Math.random() * max) + min);
+	}
+}
+
 window.addEventListener("load", function onWindowLoad() {
-    const audioEngine = createAudioEngine(), playlistService = createPlaylistService(audioEngine), playlistView = createPlaylistView(playlistService);
+    const visualizer = createVisualizer(), 
+		audioEngine = createAudioEngine(), 
+		playlistService = createPlaylistService(audioEngine), 
+		playlistView = createPlaylistView(playlistService, visualizer);
 });
